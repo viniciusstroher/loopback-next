@@ -16,8 +16,8 @@ import {writeResultToResponse} from '../writer';
  * @returns The handler function that will populate the
  * response with operation results.
  */
-export class SendProvider implements Provider<Send> {
-  value() {
+export class SendProvider {
+  static value() {
     return writeResultToResponse;
   }
 }
