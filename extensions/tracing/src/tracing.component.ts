@@ -14,6 +14,7 @@ import {
   createBindingFromClass,
   inject,
 } from '@loopback/core';
+import {NodeTracerProvider} from '@opentelemetry/node';
 import {initTracerFromEnv} from 'jaeger-client';
 import {TracingInterceptor} from './interceptors/tracing.interceptor';
 import {TracingBindings} from './keys';
@@ -30,6 +31,8 @@ export class TracingComponent implements Component {
     @config()
     tracingConfig: TracingConfig = {serviceName: 'loopback'},
   ) {
+    setupNodeTraceProvider();
+
     const tracer = initTracerFromEnv(tracingConfig, {
       contextKey: LOOPBACK_TRACE_ID,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,4 +40,22 @@ export class TracingComponent implements Component {
     this.application.bind(TracingBindings.TRACER).to(tracer);
     this.application.add(createBindingFromClass(TracingInterceptor));
   }
+}
+
+function setupNodeTraceProvider() {
+  const nodeTraceProvider = new NodeTracerProvider({
+    plugins: {
+      http: {
+        enabled: true,
+        // You may use a package name or absolute path to the file.
+        path: '@opentelemetry/plugin-http',
+      },
+      https: {
+        enabled: true,
+        // You may use a package name or absolute path to the file.
+        path: '@opentelemetry/plugin-https',
+      },
+    },
+  });
+  nodeTraceProvider.register();
 }
