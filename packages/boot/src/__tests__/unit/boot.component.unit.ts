@@ -3,15 +3,13 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {expect} from '@loopback/testlab';
 import {Application} from '@loopback/core';
+import {expect} from '@loopback/testlab';
 import {
   BootBindings,
+  BootMixin,
   Bootstrapper,
   ControllerBooter,
-  BootMixin,
-  RepositoryBooter,
-  DataSourceBooter,
   ServiceBooter,
 } from '../../';
 
@@ -32,20 +30,6 @@ describe('boot.component unit tests', () => {
       `${BootBindings.BOOTER_PREFIX}.ControllerBooter`,
     );
     expect(booterInst).to.be.an.instanceOf(ControllerBooter);
-  });
-
-  it('RepositoryBooter is bound as a booter by default', async () => {
-    const booterInst = await app.get(
-      `${BootBindings.BOOTER_PREFIX}.RepositoryBooter`,
-    );
-    expect(booterInst).to.be.an.instanceOf(RepositoryBooter);
-  });
-
-  it('DataSourceBooter is bound as a booter by default', async () => {
-    const booterInst = await app.get(
-      `${BootBindings.BOOTER_PREFIX}.DataSourceBooter`,
-    );
-    expect(booterInst).to.be.an.instanceOf(DataSourceBooter);
   });
 
   it('ServiceBooter is bound as a booter by default', async () => {
