@@ -942,6 +942,10 @@ children:
     url: Testing-your-application.html
     output: 'web, pdf'
 
+- title: 'Troubleshooting'
+  url: Troubleshooting.html
+  output: 'web, pdf'
+
 - title: 'Contribute to LoopBack 4'
   url: code-contrib-lb4.html
   output: 'web, pdf'
