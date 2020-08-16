@@ -31,7 +31,6 @@ const CLI_BASE_MODELS = [
     value: 'Entity',
   },
   {name: `Model ${chalk.gray('(A business domain object)')}`, value: 'Model'},
-  {type: 'separator', line: '----- Custom Models -----'},
 ];
 const MODEL_TEMPLATE_PATH = 'model.ts.ejs';
 
