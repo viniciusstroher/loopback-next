@@ -95,6 +95,9 @@
       "path": "extensions/cron/tsconfig.json"
     },
     {
+      "path": "extensions/grpc/tsconfig.json"
+    },
+    {
       "path": "extensions/health/tsconfig.json"
     },
     {
