@@ -316,6 +316,13 @@
 # - Standby owner(s): n/a
 /extensions/typeorm @hacksparrow
 
+# gRPC
+#
+# - Issue label: gRPC
+# - Primary owner(s): @raymondfeng
+# - Standby owner(s): n/a
+/extensions/grpc @raymondfeng
+
 #
 # Build & internal tooling
 #
