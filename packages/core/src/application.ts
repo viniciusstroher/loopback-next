@@ -15,6 +15,8 @@ import {
   JSONObject,
   Provider,
   registerInterceptor,
+  uuid,
+  ValueOrPromise,
 } from '@loopback/context';
 import assert from 'assert';
 import debugFactory from 'debug';
@@ -313,6 +315,23 @@ export class Application extends Context implements LifeCycleObserver {
   }
 
   /**
+   * Register a function to be called when the application starts.
+   *
+   * This is a shortcut for adding a binding for a LifeCycleObserver
+   * implementing a `start()` method.
+   *
+   * @param fn The function to invoke, it can be synchronous (returning `void`)
+   * or asynchronous (returning `Promise<void>`).
+   * @returns The LifeCycleObserver binding created.
+   */
+  public onStart(fn: () => ValueOrPromise<void>): Binding<LifeCycleObserver> {
+    const key = `life-cycle-observers.${fn.name || '<onStart>'}-${uuid()}`;
+    return this.bind<LifeCycleObserver>(key)
+      .to({start: fn})
+      .tag(CoreTags.LIFE_CYCLE_OBSERVER);
+  }
+
+  /**
    * Stop the application instance and all of its registered observers. The
    * application state is checked to ensure the integrity of `stop`.
    *
@@ -333,6 +352,23 @@ export class Application extends Context implements LifeCycleObserver {
     const registry = await this.getLifeCycleObserverRegistry();
     await registry.stop();
     this.setState('stopped');
+  }
+
+  /**
+   * Register a function to be called when the application starts.
+   *
+   * This is a shortcut for adding a binding for a LifeCycleObserver
+   * implementing a `start()` method.
+   *
+   * @param fn The function to invoke, it can be synchronous (returning `void`)
+   * or asynchronous (returning `Promise<void>`).
+   * @returns The LifeCycleObserver binding created.
+   */
+  public onStop(fn: () => ValueOrPromise<void>): Binding<LifeCycleObserver> {
+    const key = `life-cycle-observers.${fn.name || '<onStop>'}-${uuid()}`;
+    return this.bind<LifeCycleObserver>(key)
+      .to({stop: fn})
+      .tag(CoreTags.LIFE_CYCLE_OBSERVER);
   }
 
   private async getLifeCycleObserverRegistry() {
