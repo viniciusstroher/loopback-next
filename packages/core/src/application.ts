@@ -15,9 +15,9 @@ import {
   JSONObject,
   Provider,
   registerInterceptor,
-  uuid,
   ValueOrPromise,
 } from '@loopback/context';
+import {generateUniqueId} from '@loopback/context/dist/unique-id';
 import assert from 'assert';
 import debugFactory from 'debug';
 import {once} from 'events';
@@ -325,10 +325,15 @@ export class Application extends Context implements LifeCycleObserver {
    * @returns The LifeCycleObserver binding created.
    */
   public onStart(fn: () => ValueOrPromise<void>): Binding<LifeCycleObserver> {
-    const key = `life-cycle-observers.${fn.name || '<onStart>'}-${uuid()}`;
+    const key = [
+      CoreBindings.LIFE_CYCLE_OBSERVERS,
+      fn.name || '<onStart>',
+      generateUniqueId(),
+    ].join('.');
+
     return this.bind<LifeCycleObserver>(key)
       .to({start: fn})
-      .tag(CoreTags.LIFE_CYCLE_OBSERVER);
+      .apply(asLifeCycleObserver);
   }
 
   /**
@@ -365,10 +370,14 @@ export class Application extends Context implements LifeCycleObserver {
    * @returns The LifeCycleObserver binding created.
    */
   public onStop(fn: () => ValueOrPromise<void>): Binding<LifeCycleObserver> {
-    const key = `life-cycle-observers.${fn.name || '<onStop>'}-${uuid()}`;
+    const key = [
+      CoreBindings.LIFE_CYCLE_OBSERVERS,
+      fn.name || '<onStop>',
+      generateUniqueId(),
+    ].join('.');
     return this.bind<LifeCycleObserver>(key)
       .to({stop: fn})
-      .tag(CoreTags.LIFE_CYCLE_OBSERVER);
+      .apply(asLifeCycleObserver);
   }
 
   private async getLifeCycleObserverRegistry() {

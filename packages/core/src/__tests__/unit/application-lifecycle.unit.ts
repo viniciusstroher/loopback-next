@@ -278,7 +278,7 @@ describe('Application life cycle', () => {
         invoked = true;
       });
 
-      expect(binding.key).to.match(/^life-cycle-observers.doSomething/);
+      expect(binding.key).to.match(/^lifeCycleObservers.doSomething/);
 
       await app.start();
       expect(invoked).to.be.true();
@@ -313,7 +313,7 @@ describe('Application life cycle', () => {
         invoked = true;
       });
 
-      expect(binding.key).to.match(/^life-cycle-observers.doSomething/);
+      expect(binding.key).to.match(/^lifeCycleObservers.doSomething/);
 
       await app.start();
       expect(invoked).to.be.false();
