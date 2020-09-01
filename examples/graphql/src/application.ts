@@ -5,10 +5,10 @@
 
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
+import {GraphQLBindings, GraphQLComponent} from '@loopback/graphql';
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import path from 'path';
-import {GraphQLBindings, GraphQLComponent} from '@loopback/graphql';
 import {sampleRecipes} from './sample-recipes';
 
 export {ApplicationConfig};
@@ -24,6 +24,11 @@ export class GraphqlDemoApplication extends BootMixin(
     this.expressMiddleware('middleware.express.GraphQL', server.expressApp);
     this.configure(GraphQLBindings.GRAPHQL_SERVER).to({
       asMiddlewareOnly: true,
+    });
+
+    // It's possible to register a graphql context resolver
+    this.bind(GraphQLBindings.GRAPHQL_CONTEXT_RESOLVER).to(context => {
+      return {...context};
     });
 
     this.bind('recipes').to([...sampleRecipes]);

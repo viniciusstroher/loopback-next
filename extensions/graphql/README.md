@@ -256,6 +256,8 @@ export class RecipeResolver implements ResolverInterface<Recipe> {
     @repository('RecipeRepository')
     private readonly recipeRepo: RecipeRepository,
     @service(RecipeService) private readonly recipeService: RecipeService,
+    // It's possible to inject the resolver data
+    @inject(GraphQLBindings.RESOLVER_DATA) private resolverData: ResolverData,
   ) {}
 }
 ```
@@ -264,6 +266,47 @@ export class RecipeResolver implements ResolverInterface<Recipe> {
 
 The `GraphQLComponent` contributes a booter that discovers and registers
 resolver classes from `src/graphql-resolvers` during `app.boot()`.
+
+## Propagate context data
+
+The `GraphQLServer` allows you to propagate context from Express to resolvers.
+
+### Register a GraphQL context resolver
+
+```ts
+export class GraphqlDemoApplication extends BootMixin(
+  RepositoryMixin(RestApplication),
+) {
+  constructor(options: ApplicationConfig = {}) {
+    super(options);
+
+    // ...
+    // It's possible to register a graphql context resolver
+    this.bind(GraphQLBindings.GRAPHQL_CONTEXT_RESOLVER).to(context => {
+      // Add your custom logic here to produce a context from incoming ExpressContext
+      return {...context};
+    });
+  }
+  // ...
+}
+```
+
+### Access the GraphQL context inside a resolver
+
+```ts
+@resolver(of => Recipe)
+export class RecipeResolver implements ResolverInterface<Recipe> {
+  constructor(
+    // constructor injection of service
+    @repository('RecipeRepository')
+    private readonly recipeRepo: RecipeRepository,
+    @service(RecipeService) private readonly recipeService: RecipeService,
+    // It's possible to inject the resolver data
+    @inject(GraphQLBindings.RESOLVER_DATA) private resolverData: ResolverData,
+  ) {}
+  // ...
+}
+```
 
 ## Try it out
 

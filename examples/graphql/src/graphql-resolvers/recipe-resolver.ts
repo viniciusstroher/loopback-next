@@ -3,14 +3,16 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {service} from '@loopback/core';
+import {inject, service} from '@loopback/core';
 import {
   arg,
   fieldResolver,
+  GraphQLBindings,
   Int,
   mutation,
   query,
   resolver,
+  ResolverData,
   ResolverInterface,
   root,
 } from '@loopback/graphql';
@@ -27,6 +29,8 @@ export class RecipeResolver implements ResolverInterface<Recipe> {
     @repository('RecipeRepository')
     private readonly recipeRepo: RecipeRepository,
     @service(RecipeService) private readonly recipeService: RecipeService,
+    // It's possible to inject the resolver data
+    @inject(GraphQLBindings.RESOLVER_DATA) private resolverData: ResolverData,
   ) {}
 
   @query(returns => Recipe, {nullable: true})

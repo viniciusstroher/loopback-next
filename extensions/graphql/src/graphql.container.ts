@@ -82,9 +82,9 @@ export class LoopBackContainer implements ContainerType {
     debug(
       'Resolver %s found in context %s',
       resolverClass.name,
-      this.ctx.name,
+      resolutionCtx.name,
       found,
     );
-    return this.ctx.getValueOrPromise(found.key);
+    return resolutionCtx.getValueOrPromise(found.key);
   }
 }

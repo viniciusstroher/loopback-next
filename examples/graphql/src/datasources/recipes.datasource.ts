@@ -28,7 +28,8 @@ const config = {
     [ContextTags.NAMESPACE]: RepositoryBindings.DATASOURCES,
   },
 })
-export class RecipesDataSource extends juggler.DataSource
+export class RecipesDataSource
+  extends juggler.DataSource
   implements LifeCycleObserver {
   static dataSourceName = 'recipes';
   static readonly defaultConfig = config;

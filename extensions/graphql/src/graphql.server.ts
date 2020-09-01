@@ -17,11 +17,17 @@ import {
   Server,
 } from '@loopback/core';
 import {HttpOptions, HttpServer} from '@loopback/http-server';
+import {ContextFunction} from 'apollo-server-core';
 import {ApolloServer, ApolloServerExpressConfig} from 'apollo-server-express';
+import {ExpressContext} from 'apollo-server-express/dist/ApolloServer';
 import express from 'express';
 import {buildSchema, NonEmptyArray, ResolverInterface} from 'type-graphql';
 import {LoopBackContainer} from './graphql.container';
 import {GraphQLBindings, GraphQLTags} from './keys';
+
+export {ContextFunction} from 'apollo-server-core';
+export {ApolloServerExpressConfig} from 'apollo-server-express';
+export {ExpressContext} from 'apollo-server-express/dist/ApolloServer';
 
 /**
  * Options for GraphQL server
@@ -95,9 +101,16 @@ export class GraphQLServer extends Context implements Server {
       container: new LoopBackContainer(this),
     });
 
-    const serverConfig = {
+    // Allow a graphql context resolver to be bound to GRAPHQL_CONTEXT_RESOLVER
+    const graphqlContextResolver: ContextFunction<ExpressContext> =
+      (await this.get(GraphQLBindings.GRAPHQL_CONTEXT_RESOLVER, {
+        optional: true,
+      })) ?? (context => context);
+
+    const serverConfig: ApolloServerExpressConfig = {
       // enable GraphQL Playground
       playground: true,
+      context: graphqlContextResolver,
       ...this.options.graphql,
       schema,
     };

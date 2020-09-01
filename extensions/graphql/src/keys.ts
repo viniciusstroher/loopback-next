@@ -6,7 +6,7 @@
 import {BindingKey, Constructor} from '@loopback/core';
 import {ResolverData} from 'type-graphql';
 import {GraphQLComponent} from './graphql.component';
-import {GraphQLServer} from './graphql.server';
+import {ContextFunction, ExpressContext, GraphQLServer} from './graphql.server';
 
 export namespace GraphQLBindings {
   export const GRAPHQL_SERVER = BindingKey.create<GraphQLServer>(
@@ -16,6 +16,10 @@ export namespace GraphQLBindings {
   export const COMPONENT = BindingKey.create<GraphQLComponent>(
     'components.GraphQLComponent',
   );
+
+  export const GRAPHQL_CONTEXT_RESOLVER = BindingKey.create<
+    ContextFunction<ExpressContext>
+  >('graphql.contextResolver');
 
   export const RESOLVER_DATA = BindingKey.create<ResolverData<unknown>>(
     'graphql.resolverData',
