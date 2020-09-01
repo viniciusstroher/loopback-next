@@ -9,6 +9,7 @@ import {
   Arg,
   Args,
   ArgsType,
+  Authorized,
   Field,
   FieldResolver,
   InputType,
@@ -36,3 +37,4 @@ export const root = Root;
 export const field = Field;
 export const inputType = InputType;
 export const objectType = ObjectType;
+export const authorized = Authorized;

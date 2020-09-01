@@ -5,6 +5,7 @@
 
 import {
   Binding,
+  BindingKey,
   BindingScope,
   config,
   Constructor,
@@ -21,7 +22,13 @@ import {ContextFunction} from 'apollo-server-core';
 import {ApolloServer, ApolloServerExpressConfig} from 'apollo-server-express';
 import {ExpressContext} from 'apollo-server-express/dist/ApolloServer';
 import express from 'express';
-import {buildSchema, NonEmptyArray, ResolverInterface} from 'type-graphql';
+import {
+  AuthChecker,
+  buildSchema,
+  NonEmptyArray,
+  ResolverInterface,
+} from 'type-graphql';
+import {Middleware} from 'type-graphql/dist/interfaces/Middleware';
 import {LoopBackContainer} from './graphql.container';
 import {GraphQLBindings, GraphQLTags} from './keys';
 
@@ -83,14 +90,35 @@ export class GraphQLServer extends Context implements Server {
       .map(b => b.valueConstructor as Constructor<ResolverInterface<object>>);
   }
 
+  async getMiddlewares(): Promise<Middleware<unknown>[]> {
+    const view = this.createView<Middleware<unknown>>(
+      filterByTag(GraphQLTags.MIDDLEWARE),
+    );
+    return view.values();
+  }
+
+  middleware(middleware: Middleware<unknown>): Binding<Middleware<unknown>> {
+    return this.bind<Middleware<unknown>>(
+      BindingKey.generate(`graphql.middleware`),
+    )
+      .to(middleware)
+      .tag(GraphQLTags.MIDDLEWARE);
+  }
+
   resolver(resolverClass: Constructor<ResolverInterface<object>>) {
-    registerResolver(this, resolverClass);
+    return registerResolver(this, resolverClass);
   }
 
   async start() {
     const resolverClasses = (this.getResolvers() as unknown) as NonEmptyArray<
       Function
     >;
+
+    const authChecker: AuthChecker =
+      (await this.get(GraphQLBindings.GRAPHQL_AUTH_CHECKER, {
+        optional: true,
+      })) ?? ((resolverData, roles) => true);
+
     // build TypeGraphQL executable schema
     const schema = await buildSchema({
       // See https://github.com/MichalLytek/type-graphql/issues/150#issuecomment-420181526
@@ -99,6 +127,8 @@ export class GraphQLServer extends Context implements Server {
       // automatically create `schema.gql` file with schema definition in current folder
       // emitSchemaFile: path.resolve(__dirname, 'schema.gql'),
       container: new LoopBackContainer(this),
+      authChecker,
+      globalMiddlewares: await this.getMiddlewares(),
     });
 
     // Allow a graphql context resolver to be bound to GRAPHQL_CONTEXT_RESOLVER

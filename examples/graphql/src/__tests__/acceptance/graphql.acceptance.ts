@@ -5,7 +5,12 @@
 
 import {Application, createBindingFromClass} from '@loopback/core';
 import {GraphQLServer} from '@loopback/graphql';
-import {supertest} from '@loopback/testlab';
+import {
+  createRestAppClient,
+  givenHttpServerConfig,
+  supertest,
+} from '@loopback/testlab';
+import {GraphqlDemoApplication} from '../../';
 import {RecipesDataSource} from '../../datasources';
 import {RecipeResolver} from '../../graphql-resolvers/recipe-resolver';
 import {RecipeRepository} from '../../repositories';
@@ -70,5 +75,25 @@ describe('GraphQL application', () => {
   async function stopApp() {
     if (!app) return;
     await app.stop();
+  }
+});
+
+describe('GraphQL as middleware', () => {
+  let app: GraphqlDemoApplication;
+
+  before(giveAppWithGraphQLMiddleware);
+  after(stopApp);
+
+  runTests(() => createRestAppClient(app));
+
+  async function giveAppWithGraphQLMiddleware() {
+    app = new GraphqlDemoApplication({rest: givenHttpServerConfig()});
+    await app.boot();
+    await app.start();
+    return app;
+  }
+
+  async function stopApp() {
+    await app?.stop();
   }
 });

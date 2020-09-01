@@ -4,7 +4,7 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import {BindingKey, Constructor} from '@loopback/core';
-import {ResolverData} from 'type-graphql';
+import {AuthChecker, ResolverData} from 'type-graphql';
 import {GraphQLComponent} from './graphql.component';
 import {ContextFunction, ExpressContext, GraphQLServer} from './graphql.server';
 
@@ -21,6 +21,10 @@ export namespace GraphQLBindings {
     ContextFunction<ExpressContext>
   >('graphql.contextResolver');
 
+  export const GRAPHQL_AUTH_CHECKER = BindingKey.create<AuthChecker>(
+    'graphql.authChecker',
+  );
+
   export const RESOLVER_DATA = BindingKey.create<ResolverData<unknown>>(
     'graphql.resolverData',
   );
@@ -35,4 +39,5 @@ export namespace GraphQLBindings {
 export namespace GraphQLTags {
   export const GRAPHQL = 'graphql';
   export const RESOLVER = 'graphql.resolver';
+  export const MIDDLEWARE = 'graphql.middleware';
 }

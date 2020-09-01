@@ -273,6 +273,10 @@ The `GraphQLServer` allows you to propagate context from Express to resolvers.
 
 ### Register a GraphQL context resolver
 
+The GraphQL context object can be built/enhanced by the context resolver. The
+original value is `{req: Request, res: Response}` that represents the Express
+request and response object.
+
 ```ts
 export class GraphqlDemoApplication extends BootMixin(
   RepositoryMixin(RestApplication),
@@ -303,8 +307,73 @@ export class RecipeResolver implements ResolverInterface<Recipe> {
     @service(RecipeService) private readonly recipeService: RecipeService,
     // It's possible to inject the resolver data
     @inject(GraphQLBindings.RESOLVER_DATA) private resolverData: ResolverData,
-  ) {}
+  ) {
+    // `this.resolverData.context` is the GraphQL context
+  }
   // ...
+}
+```
+
+### Set up authorization checker
+
+We can customize the `authChecker` for
+[TypeGraphQL Authorization](https://typegraphql.com/docs/authorization.html).
+
+```ts
+export class GraphqlDemoApplication extends BootMixin(
+  RepositoryMixin(RestApplication),
+) {
+  constructor(options: ApplicationConfig = {}) {
+    super(options);
+
+    // ...
+    // It's possible to register a graphql auth checker
+    this.bind(GraphQLBindings.GRAPHQL_AUTH_CHECKER).to(
+      (resolverData, roles) => {
+        // Use resolverData and roles for authorization
+        return true;
+      },
+    );
+  }
+  // ...
+}
+```
+
+The resolver classes and graphql types can be decorated with `@authorized` to
+enforce authorization.
+
+```ts
+@resolver(of => Recipe)
+export class RecipeResolver implements ResolverInterface<Recipe> {
+  constructor() {} // ...
+
+  @query(returns => Recipe, {nullable: true})
+  @authorized('owner') // Authorized against `owner` role
+  async recipe(@arg('recipeId') recipeId: string) {
+    return this.recipeRepo.getOne(recipeId);
+  }
+}
+```
+
+## Register GraphQL middleware
+
+We can register one or more
+[TypeGraphQL Middleware](https://typegraphql.com/docs/middlewares.html) as
+follows:
+
+```ts
+export class GraphqlDemoApplication extends BootMixin(
+  RepositoryMixin(RestApplication),
+) {
+  constructor(options: ApplicationConfig = {}) {
+    super(options);
+
+    // Register a GraphQL middleware
+    this.middleware((resolverData, next) => {
+      // It's invoked for each field resolver, query and mutation operations
+      return next();
+    });
+  }
 }
 ```
 

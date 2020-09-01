@@ -25,7 +25,7 @@ export function runTests(getClient: () => supertest.SuperTest<supertest.Test>) {
       .post('/graphql')
       .set('content-type', 'application/json')
       .accept('application/json')
-      .send({operationName: 'GetRecipe1', variables: {}, query: example})
+      .send({operationName: 'GetRecipe1', variables: {}, query: exampleQuery})
       .expect(200, expectedData);
   });
 
@@ -34,7 +34,7 @@ export function runTests(getClient: () => supertest.SuperTest<supertest.Test>) {
       .post('/graphql')
       .set('content-type', 'application/json')
       .accept('application/json')
-      .send({operationName: 'AddRecipe', variables: {}, query: example})
+      .send({operationName: 'AddRecipe', variables: {}, query: exampleQuery})
       .expect(200);
     expect(res.body.data.addRecipe).to.containEql({
       id: '4',
@@ -81,13 +81,13 @@ export function runTests(getClient: () => supertest.SuperTest<supertest.Test>) {
       .post('/graphql')
       .set('content-type', 'application/json')
       .accept('application/json')
-      .send({operationName: 'GetRecipes', variables: {}, query: example})
+      .send({operationName: 'GetRecipes', variables: {}, query: exampleQuery})
       .expect(200);
     expect(res.body.data.recipes).to.eql(expectedRecipes);
   });
 }
 
-const example = `query GetRecipe1 {
+export const exampleQuery = `query GetRecipe1 {
   recipe(recipeId: "1") {
     title
     description

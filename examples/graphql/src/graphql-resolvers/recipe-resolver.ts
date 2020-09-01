@@ -6,6 +6,7 @@
 import {inject, service} from '@loopback/core';
 import {
   arg,
+  authorized,
   fieldResolver,
   GraphQLBindings,
   Int,
@@ -34,6 +35,7 @@ export class RecipeResolver implements ResolverInterface<Recipe> {
   ) {}
 
   @query(returns => Recipe, {nullable: true})
+  @authorized('owner')
   async recipe(@arg('recipeId') recipeId: string) {
     return this.recipeRepo.getOne(recipeId);
   }
